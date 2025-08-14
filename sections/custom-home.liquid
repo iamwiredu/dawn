@@ -1,18 +1,16 @@
+<!-- sections/custom-home.liquid -->
 {% comment %}
   Custom homepage section converted from a Django template.
-  - Remove all Django tags like {% load static %}, {% url %}, {% csrf_token %}, messages loop, etc.
-  - Images/CSS are read from theme assets. Upload files in /assets with the same names used below or change the filenames.
+  - No Django tags.
+  - Put all assets directly in /assets (no subfolders). Example: 1.jpg, fh-logo.svg, styles.css
 {% endcomment %}
 
 <section class="fh-home">
-
-  {# --- HEAD TAG CONTENT MOVED TO LAYOUT. KEEP ONLY WHAT YOU NEED HERE --- #}
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="{{ 'fh-logo.svg' | asset_url }}">
   <link rel="stylesheet" href="{{ 'styles.css' | asset_url }}">
 
   <style>
-    /* --- keep your inline CSS here or move to styles.css --- */
     .menu-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);backdrop-filter:blur(5px);z-index:999;opacity:0;visibility:hidden;transition:all .3s ease}
     .menu-overlay.active{opacity:1;visibility:visible}
     .slide-menu{position:fixed;top:0;left:0;width:350px;height:100vh;background:rgba(255,255,255,.954);backdrop-filter:blur(20px);border-right:1px solid rgba(255,255,255,.2);z-index:1000;transform:translateX(-100%);transition:transform .4s cubic-bezier(.4,0,.2,1);padding:2rem;display:flex;flex-direction:column;color:#000}
@@ -30,7 +28,6 @@
     .hero-image{position:absolute;top:0;left:0;width:100%;height:100%;overflow:hidden}
     .hero-image img{width:100%;height:100%;object-fit:cover;object-position:center;transition:transform .3s ease}
     .hero-image img:hover{transform:scale(1.02)}
-    /* ... (keep the rest of your CSS here or move to styles.css) ... */
   </style>
 
   <!-- Menu Overlay -->
@@ -43,9 +40,6 @@
       <nav class="menu-nav">
         <ul>
           <li><a href="{{ routes.root_url }}">Home</a></li>
-          {%- comment -%}
-            Replace the links below with your real collection handles or use a menu setting.
-          {%- endcomment -%}
           <li><a href="/collections/men">Men</a></li>
           <li><a href="/collections/women">Women</a></li>
           <li><a href="/collections/accessories">Accessories</a></li>
@@ -56,7 +50,6 @@
       <div class="menu-footer">
         <div class="menu-social">
           <a href="https://x.com/flyhighwrld" aria-label="X (formerly Twitter)">
-            <!-- your SVGs unchanged -->
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
           </a>
           <a href="https://www.instagram.com/flyhigh.wrld" aria-label="Instagram">
@@ -96,7 +89,7 @@
   <!-- Hero -->
   <section class="hero">
     <div class="hero-image" id="heroImage">
-      <img src="{{ 'images/1.jpg' | asset_url }}" alt="Fly High Luxury Fashion">
+      <img src="{{ '1.jpg' | asset_url }}" alt="Fly High Luxury Fashion">
     </div>
     <div class="hero-overlay"></div>
     <div class="hero-content">
@@ -108,7 +101,7 @@
     </div>
   </section>
 
-  <!-- Featured Collection (static images; swap to dynamic if you want) -->
+  <!-- Featured Collection (static images) -->
   <section class="featured-collection">
     <div class="container">
       <div class="section-header fade-in">
@@ -118,17 +111,17 @@
       <div class="collection-grid">
         <div class="collection-item large-item grid-item">
           <div class="item-image image-reveal">
-            <img src="{{ 'images/2.jpg' | asset_url }}" alt="Cashmere Collection">
+            <img src="{{ '2.jpg' | asset_url }}" alt="Cashmere Collection">
           </div>
         </div>
         <div class="collection-item grid-item">
           <div class="item-image image-reveal">
-            <img src="{{ 'images/3.jpg' | asset_url }}" alt="Leather Goods">
+            <img src="{{ '3.jpg' | asset_url }}" alt="Leather Goods">
           </div>
         </div>
         <div class="collection-item grid-item">
           <div class="item-image image-reveal">
-            <img src="{{ 'images/4.jpg' | asset_url }}" alt="Footwear">
+            <img src="{{ '4.jpg' | asset_url }}" alt="Footwear">
           </div>
         </div>
       </div>
@@ -139,7 +132,7 @@
   <section class="split-section">
     <div class="split-item slide-in-left">
       <div class="split-image image-reveal">
-        <img src="{{ 'images/5.jpg' | asset_url }}" alt="Craftsmanship">
+        <img src="{{ '5.jpg' | asset_url }}" alt="Craftsmanship">
       </div>
       <div class="split-overlay"></div>
       <div class="split-content">
@@ -149,7 +142,7 @@
     </div>
     <div class="split-item slide-in-right">
       <div class="split-image image-reveal">
-        <img src="{{ 'images/6.jpg' | asset_url }}" alt="Sustainability">
+        <img src="{{ '6.jpg' | asset_url }}" alt="Sustainability">
       </div>
       <div class="split-overlay"></div>
       <div class="split-content">
@@ -167,27 +160,27 @@
         <h3 class="section-title">The Art of Luxury</h3>
       </div>
 
-      <!-- Mobile Carousel (trimmed for brevity; keep your SVGs/images) -->
+      <!-- Mobile Carousel -->
       <div class="mobile-carousel">
         <div class="carousel-container">
           <div class="carousel-slide active">
             <div class="carousel-image">
-              <img src="{{ 'images/7.jpg' | asset_url }}" alt="Detail">
+              <img src="{{ '7.jpg' | asset_url }}" alt="Detail">
             </div>
           </div>
           <div class="carousel-slide">
             <div class="carousel-image">
-              <img src="{{ 'images/8.jpg' | asset_url }}" alt="Detail">
+              <img src="{{ '8.jpg' | asset_url }}" alt="Detail">
             </div>
           </div>
           <div class="carousel-slide">
             <div class="carousel-image">
-              <img src="{{ 'images/m2.jpg' | asset_url }}" alt="Detail">
+              <img src="{{ 'm2.jpg' | asset_url }}" alt="Detail">
             </div>
           </div>
           <div class="carousel-slide">
             <div class="carousel-image">
-              <img src="{{ 'images/10.jpg' | asset_url }}" alt="Detail">
+              <img src="{{ '10.jpg' | asset_url }}" alt="Detail">
             </div>
           </div>
         </div>
@@ -203,27 +196,27 @@
       <div class="gallery-grid">
         <div class="gallery-item large-gallery-item grid-item">
           <div class="gallery-image image-reveal">
-            <img src="{{ 'images/b1.jpg' | asset_url }}" alt="Lifestyle">
+            <img src="{{ 'b1.jpg' | asset_url }}" alt="Lifestyle">
           </div>
         </div>
         <div class="gallery-item grid-item">
           <div class="gallery-image image-reveal">
-            <img src="{{ 'images/7.jpg' | asset_url }}" alt="Detail">
+            <img src="{{ '7.jpg' | asset_url }}" alt="Detail">
           </div>
         </div>
         <div class="gallery-item grid-item">
           <div class="gallery-image image-reveal">
-            <img src="{{ 'images/8.jpg' | asset_url }}" alt="Detail">
+            <img src="{{ '8.jpg' | asset_url }}" alt="Detail">
           </div>
         </div>
         <div class="gallery-item grid-item">
           <div class="gallery-image image-reveal">
-            <img src="{{ 'images/m2.jpg' | asset_url }}" alt="Detail">
+            <img src="{{ 'm2.jpg' | asset_url }}" alt="Detail">
           </div>
         </div>
         <div class="gallery-item grid-item">
           <div class="gallery-image image-reveal">
-            <img src="{{ 'images/10.jpg' | asset_url }}" alt="Detail">
+            <img src="{{ '10.jpg' | asset_url }}" alt="Detail">
           </div>
         </div>
       </div>
@@ -233,7 +226,7 @@
   <!-- Newsletter Section -->
   <section class="newsletter" id="contact">
     <div class="newsletter-background" id="newsletterBg">
-      <img src="{{ 'images/11.jpg' | asset_url }}" alt="Newsletter background">
+      <img src="{{ '11.jpg' | asset_url }}" alt="Newsletter background">
     </div>
     <div class="newsletter-overlay"></div>
     <div class="newsletter-content fade-in">
@@ -303,7 +296,7 @@
     </div>
   </footer>
 
-  <!-- Message Modal (static success/errors handled via form above) -->
+  <!-- Message Modal -->
   <div id="messageModal" class="modal-overlay" style="display:none;">
     <div class="modal-box">
       <span id="closeModal" class="modal-close">&times;</span>
@@ -312,7 +305,6 @@
   </div>
 
   <script>
-    // Keep your JS exactly as-is (no Django bits) — shortened here
     document.addEventListener('DOMContentLoaded', function() {
       const menuBtn = document.getElementById('menuBtn');
       const menuOverlay = document.getElementById('menuOverlay');
