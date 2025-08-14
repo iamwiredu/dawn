@@ -1,0 +1,348 @@
+{% comment %}
+  Custom homepage section converted from a Django template.
+  - Remove all Django tags like {% load static %}, {% url %}, {% csrf_token %}, messages loop, etc.
+  - Images/CSS are read from theme assets. Upload files in /assets with the same names used below or change the filenames.
+{% endcomment %}
+
+<section class="fh-home">
+
+  {# --- HEAD TAG CONTENT MOVED TO LAYOUT. KEEP ONLY WHAT YOU NEED HERE --- #}
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="{{ 'fh-logo.svg' | asset_url }}">
+  <link rel="stylesheet" href="{{ 'styles.css' | asset_url }}">
+
+  <style>
+    /* --- keep your inline CSS here or move to styles.css --- */
+    .menu-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);backdrop-filter:blur(5px);z-index:999;opacity:0;visibility:hidden;transition:all .3s ease}
+    .menu-overlay.active{opacity:1;visibility:visible}
+    .slide-menu{position:fixed;top:0;left:0;width:350px;height:100vh;background:rgba(255,255,255,.954);backdrop-filter:blur(20px);border-right:1px solid rgba(255,255,255,.2);z-index:1000;transform:translateX(-100%);transition:transform .4s cubic-bezier(.4,0,.2,1);padding:2rem;display:flex;flex-direction:column;color:#000}
+    .slide-menu.active{transform:translateX(0)}
+    .menu-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:3rem;padding-bottom:1rem;border-bottom:1px solid rgba(255,255,255,.2)}
+    .menu-logo{color:#000;font-size:1.5rem;font-weight:300;letter-spacing:2px}
+    .menu-close{background:none;border:none;color:#000;font-size:1.5rem;cursor:pointer;padding:.5rem;border-radius:50%}
+    .menu-nav{flex:1;overflow-y:auto}
+    .menu-nav ul{list-style:none;padding:0;margin:0}
+    .menu-nav li{margin-bottom:1.5rem;overflow:hidden}
+    .menu-nav a{color:#000;text-decoration:none;font-size:1.2rem;font-weight:300;letter-spacing:1px;padding:1rem 0;display:block;border-bottom:1px solid transparent;transition:all .3s ease;position:relative;overflow:hidden}
+    .menu-nav a::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);transition:left .5s ease}
+    .menu-nav a:hover::before{left:100%}
+    .menu-btn{background:none;border:none;color:#fff;font-size:1rem;cursor:pointer;padding:.5rem 1rem;border-radius:25px;transition:all .3s ease}
+    .hero-image{position:absolute;top:0;left:0;width:100%;height:100%;overflow:hidden}
+    .hero-image img{width:100%;height:100%;object-fit:cover;object-position:center;transition:transform .3s ease}
+    .hero-image img:hover{transform:scale(1.02)}
+    /* ... (keep the rest of your CSS here or move to styles.css) ... */
+  </style>
+
+  <!-- Menu Overlay -->
+  <div class="menu-overlay" id="menuOverlay">
+    <div class="slide-menu" id="slideMenu">
+      <div class="menu-header">
+        <div class="menu-logo">FLY HIGH</div>
+        <button class="menu-close" id="menuClose">&times;</button>
+      </div>
+      <nav class="menu-nav">
+        <ul>
+          <li><a href="{{ routes.root_url }}">Home</a></li>
+          {%- comment -%}
+            Replace the links below with your real collection handles or use a menu setting.
+          {%- endcomment -%}
+          <li><a href="/collections/men">Men</a></li>
+          <li><a href="/collections/women">Women</a></li>
+          <li><a href="/collections/accessories">Accessories</a></li>
+          <li><a href="/pages/client-services">Client Services</a></li>
+          <li><a href="{{ routes.root_url }}#contact">Contact</a></li>
+        </ul>
+      </nav>
+      <div class="menu-footer">
+        <div class="menu-social">
+          <a href="https://x.com/flyhighwrld" aria-label="X (formerly Twitter)">
+            <!-- your SVGs unchanged -->
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+          <a href="https://www.instagram.com/flyhigh.wrld" aria-label="Instagram">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="m16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-container">
+      <button class="menu-btn" id="menuBtn">Menu</button>
+
+      <div class="logo-container floating">
+        <div class="logo-circle">
+          <img src="{{ 'fh-logo.svg' | asset_url }}" alt="Fly High logo">
+        </div>
+        <h1 class="brand-name">Fly High</h1>
+      </div>
+
+      <div class="header-right">
+        <div class="social-links">
+          <a href="https://x.com/flyhighwrld" class="social-link" aria-label="X (formerly Twitter)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+          <a href="https://www.instagram.com/flyhigh.wrld" class="social-link" aria-label="Instagram">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="m16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          </a>
+        </div>
+        <div class="language">English</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-image" id="heroImage">
+      <img src="{{ 'images/1.jpg' | asset_url }}" alt="Fly High Luxury Fashion">
+    </div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-text fade-in" style="position:absolute;bottom:48px;">
+        <a href="{{ routes.all_products_collection_url }}">
+          <button class="cta-button">Discover Now</button>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Collection (static images; swap to dynamic if you want) -->
+  <section class="featured-collection">
+    <div class="container">
+      <div class="section-header fade-in">
+        <p class="section-subtitle">Featured Collection</p>
+        <h3 class="section-title">Luxury Essentials</h3>
+      </div>
+      <div class="collection-grid">
+        <div class="collection-item large-item grid-item">
+          <div class="item-image image-reveal">
+            <img src="{{ 'images/2.jpg' | asset_url }}" alt="Cashmere Collection">
+          </div>
+        </div>
+        <div class="collection-item grid-item">
+          <div class="item-image image-reveal">
+            <img src="{{ 'images/3.jpg' | asset_url }}" alt="Leather Goods">
+          </div>
+        </div>
+        <div class="collection-item grid-item">
+          <div class="item-image image-reveal">
+            <img src="{{ 'images/4.jpg' | asset_url }}" alt="Footwear">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Split Image Section -->
+  <section class="split-section">
+    <div class="split-item slide-in-left">
+      <div class="split-image image-reveal">
+        <img src="{{ 'images/5.jpg' | asset_url }}" alt="Craftsmanship">
+      </div>
+      <div class="split-overlay"></div>
+      <div class="split-content">
+        <h3>Artisan Craftsmanship</h3>
+        <p>Every piece tells a story of dedication and skill</p>
+      </div>
+    </div>
+    <div class="split-item slide-in-right">
+      <div class="split-image image-reveal">
+        <img src="{{ 'images/6.jpg' | asset_url }}" alt="Sustainability">
+      </div>
+      <div class="split-overlay"></div>
+      <div class="split-content">
+        <h3>Fine Luxury</h3>
+        <p>Committed to timeless design</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Lifestyle Gallery -->
+  <section class="lifestyle-gallery">
+    <div class="container">
+      <div class="section-header fade-in">
+        <p class="section-subtitle">Lifestyle</p>
+        <h3 class="section-title">The Art of Luxury</h3>
+      </div>
+
+      <!-- Mobile Carousel (trimmed for brevity; keep your SVGs/images) -->
+      <div class="mobile-carousel">
+        <div class="carousel-container">
+          <div class="carousel-slide active">
+            <div class="carousel-image">
+              <img src="{{ 'images/7.jpg' | asset_url }}" alt="Detail">
+            </div>
+          </div>
+          <div class="carousel-slide">
+            <div class="carousel-image">
+              <img src="{{ 'images/8.jpg' | asset_url }}" alt="Detail">
+            </div>
+          </div>
+          <div class="carousel-slide">
+            <div class="carousel-image">
+              <img src="{{ 'images/m2.jpg' | asset_url }}" alt="Detail">
+            </div>
+          </div>
+          <div class="carousel-slide">
+            <div class="carousel-image">
+              <img src="{{ 'images/10.jpg' | asset_url }}" alt="Detail">
+            </div>
+          </div>
+        </div>
+        <div class="carousel-dots">
+          <span class="dot active" data-slide="0"></span>
+          <span class="dot" data-slide="1"></span>
+          <span class="dot" data-slide="2"></span>
+          <span class="dot" data-slide="3"></span>
+        </div>
+      </div>
+
+      <!-- Desktop Grid -->
+      <div class="gallery-grid">
+        <div class="gallery-item large-gallery-item grid-item">
+          <div class="gallery-image image-reveal">
+            <img src="{{ 'images/b1.jpg' | asset_url }}" alt="Lifestyle">
+          </div>
+        </div>
+        <div class="gallery-item grid-item">
+          <div class="gallery-image image-reveal">
+            <img src="{{ 'images/7.jpg' | asset_url }}" alt="Detail">
+          </div>
+        </div>
+        <div class="gallery-item grid-item">
+          <div class="gallery-image image-reveal">
+            <img src="{{ 'images/8.jpg' | asset_url }}" alt="Detail">
+          </div>
+        </div>
+        <div class="gallery-item grid-item">
+          <div class="gallery-image image-reveal">
+            <img src="{{ 'images/m2.jpg' | asset_url }}" alt="Detail">
+          </div>
+        </div>
+        <div class="gallery-item grid-item">
+          <div class="gallery-image image-reveal">
+            <img src="{{ 'images/10.jpg' | asset_url }}" alt="Detail">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Newsletter Section -->
+  <section class="newsletter" id="contact">
+    <div class="newsletter-background" id="newsletterBg">
+      <img src="{{ 'images/11.jpg' | asset_url }}" alt="Newsletter background">
+    </div>
+    <div class="newsletter-overlay"></div>
+    <div class="newsletter-content fade-in">
+      <h3>Stay Connected</h3>
+      <p>Be the first to discover our latest collections and exclusive events</p>
+
+      {% form 'customer', id: 'NewsletterForm' %}
+        <input type="hidden" name="contact[tags]" value="newsletter">
+        <div class="newsletter-form">
+          <input
+            type="email"
+            name="contact[email]"
+            placeholder="Enter your email"
+            class="email-input"
+            required
+          >
+          <button class="subscribe-btn" type="submit">Subscribe</button>
+        </div>
+
+        {% if form.posted_successfully? %}
+          <div class="modal-message success">Thanks for subscribing!</div>
+        {% elsif form.errors %}
+          <div class="modal-message error">{{ form.errors | default_errors }}</div>
+        {% endif %}
+      {% endform %}
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-column fade-in">
+          <h4>Collections</h4>
+          <ul>
+            <li><img src="{{ 'fh-logo-white.svg' | asset_url }}" alt=""></li>
+            <li><a href="{{ routes.all_products_collection_url }}">Shop Now.</a></li>
+          </ul>
+        </div>
+        <div class="footer-column fade-in">
+          <h4>Services</h4>
+          <ul>
+            <li><a href="/policies/terms-of-service">Terms of Service</a></li>
+          </ul>
+        </div>
+        <div class="footer-column fade-in">
+          <h4>Support</h4>
+          <ul>
+            <li><a href="/pages/contact">Contact Us</a></li>
+            <li><a href="/policies/privacy-policy">Privacy Policy</a></li>
+            <li><a href="/policies/refund-policy">Refund Policy</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom fade-in">
+        <p>&copy; {{ 'now' | date: "%Y" }} Fly High - All Rights Reserved</p>
+        <div class="footer-social">
+          <a href="https://x.com/flyhighwrld" class="footer-social-link" aria-label="X (formerly Twitter)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+          <a href="https://www.instagram.com/flyhigh.wrld" class="footer-social-link" aria-label="Instagram">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="m16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Message Modal (static success/errors handled via form above) -->
+  <div id="messageModal" class="modal-overlay" style="display:none;">
+    <div class="modal-box">
+      <span id="closeModal" class="modal-close">&times;</span>
+      <div class="modal-content"></div>
+    </div>
+  </div>
+
+  <script>
+    // Keep your JS exactly as-is (no Django bits) — shortened here
+    document.addEventListener('DOMContentLoaded', function() {
+      const menuBtn = document.getElementById('menuBtn');
+      const menuOverlay = document.getElementById('menuOverlay');
+      const slideMenu = document.getElementById('slideMenu');
+      const menuClose = document.getElementById('menuClose');
+
+      function closeMenu(){
+        menuOverlay.classList.remove('active');
+        slideMenu.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+      menuBtn?.addEventListener('click', function(){
+        menuOverlay.classList.add('active');
+        slideMenu.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      });
+      menuClose?.addEventListener('click', closeMenu);
+      menuOverlay?.addEventListener('click', function(e){ if(e.target===menuOverlay) closeMenu();});
+      document.addEventListener('keydown', function(e){ if(e.key==='Escape' && menuOverlay.classList.contains('active')) closeMenu();});
+    });
+  </script>
+</section>
+
+{% schema %}
+{
+  "name": "Custom Home (Fly High)",
+  "settings": [],
+  "blocks": [],
+  "presets": [
+    { "name": "Custom Home (Fly High)" }
+  ]
+}
+{% endschema %}
