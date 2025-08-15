@@ -1,9 +1,22 @@
-
 {
   "sections": {
     "main": {
-      "type": "custom-home",
-      "settings": {}
+      "type": "homepage-luxury",
+      "settings": {
+        "hero_title": "Luxury Fashion",
+        "hero_button_text": "Discover Now",
+        "featured_subtitle": "Featured Collection",
+        "featured_title": "Luxury Essentials",
+        "split_title_1": "Artisan Craftsmanship",
+        "split_text_1": "Every piece tells a story of dedication and skill",
+        "split_title_2": "Fine Luxury",
+        "split_text_2": "Committed to timeless design",
+        "gallery_subtitle": "Lifestyle",
+        "gallery_title": "The Art of Luxury",
+        "newsletter_title": "Stay Connected",
+        "newsletter_text": "Be the first to discover our latest collections and exclusive events",
+        "newsletter_button": "Subscribe"
+      }
     }
   },
   "order": ["main"]

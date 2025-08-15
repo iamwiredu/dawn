@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="{{ request.locale.iso_code }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <title>{{ page_title }}{% if current_tags %} &ndash; {{ 'general.meta.tags' | t: tags: current_tags | join: ', ' }}{% endif %}{% if current_page != 1 %} &ndash; {{ 'general.meta.page' | t: page: current_page }}{% endif %}{% unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless %}</title>
+    
+    {% if page_description %}
+    <meta name="description" content="{{ page_description | escape }}">
+    {% endif %}
+    
+    <link rel="canonical" href="{{ canonical_url }}">
+
+    {% if settings.favicon != blank %}
+    <link rel="icon" type="image/png" href="{{ settings.favicon | img_url: '32x32' }}">
+    {% endif %}
+
+    {% comment %} CSS will be in assets/styles.css.liquid {% endcomment %}
+    {{ 'styles.css' | asset_url | stylesheet_tag }}
+
+    <style>
+        /* Glassy Slide-in Menu Styles */
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .menu-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .slide-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 350px;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.954);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            z-index: 1000;
+            transform: translateX(-100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            color: black;
+        }
+        .slide-menu.active {
+            transform: translateX(0);
+        }
+        .menu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .menu-logo {
+            color: rgb(0, 0, 0);
+            font-size: 1.5rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+        .menu-close {
+            background: none;
+            border: none;
+            color: rgb(0, 0, 0);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }              
+        .menu-nav {
+            flex: 1;
+            overflow-y: scroll;
+        }
+        .menu-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .menu-nav li {
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        .menu-nav a {
+            color: rgb(0, 0, 0);
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+            padding: 1rem 0;
+            display: block;
+            border-bottom: 1px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .menu-nav a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+        .menu-nav a:hover::before {
+            left: 100%;
+        }
+        .menu-nav a:hover {
+            color: #000000;
+            border-bottom-color: rgba(255, 255, 255, 0.3);
+            transform: translateX(10px);
+        }
+        .menu-footer {
+            margin-top: auto;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .menu-social {
+            display: flex;
+            gap: 1rem;
+        }
+        .menu-social a {
+            color: rgb(0, 0, 0);
+            padding: 0.5rem;
+            border-radius: 50%;                      
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .menu-social a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        /* Update menu button to be more visible */
+        .menu-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+        .menu-btn:hover {
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        /* Mobile responsiveness for menu */
+        @media (max-width: 768px) {
+            .slide-menu {
+                width: 280px;
+                padding: 1.5rem;
+            }                        
+            .menu-nav a {
+                font-size: 1.1rem;
+            }
+        }
+        @media (max-width: 480px) {
+            .slide-menu {
+                width: 100%;
+                max-width: 280px;
+            }
+        }
+        /* Hero Image Styles */
+        .hero-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        .hero-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            transition: transform 0.3s ease;
+        }
+        .hero-image img:hover {
+            transform: scale(1.02);
+        }
+        /* Popup overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        /* Modal box */
+        .modal-box {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+            animation: fadeInUp 0.3s ease;
+            position: relative;
+            text-align: center;
+        }
+
+        /* Close button */
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #555;
+            transition: color 0.2s;
+        }
+        .modal-close:hover {
+            color: #000;
+        }
+
+        /* Message styling */
+        .modal-message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            font-weight: 500;
+        }
+        .modal-message.success { background: #d4edda; color: #155724; }
+        .modal-message.info { background: #d1ecf1; color: #0c5460; }
+        .modal-message.error { background: #f8d7da; color: #721c24; }
+
+        /* Animation */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Menu Overlay -->
+    <div class="menu-overlay" id="menuOverlay">
+        <div class="slide-menu" id="slideMenu">
+            <div class="menu-header">
+                <div class="menu-logo">{{ shop.name | upcase }}</div>
+                <button class="menu-close" id="menuClose">&times;</button>
+            </div>
+            <nav class="menu-nav">
+                <ul>
+                    <li><a href="{{ routes.root_url }}">Home</a></li>
+                    {% for link in linklists.main-menu.links %}
+                    <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+                    {% endfor %}
+                    <li><a href="{{ routes.collections_url }}">All Collections</a></li>
+                    <li><a href="{{ routes.cart_url }}">Cart</a></li>
+                    {% if shop.customer_accounts_enabled %}
+                        {% if customer %}
+                            <li><a href="{{ routes.account_url }}">Account</a></li>
+                            <li><a href="{{ routes.account_logout_url }}">Logout</a></li>
+                        {% else %}
+                            <li><a href="{{ routes.account_login_url }}">Login</a></li>
+                            <li><a href="{{ routes.account_register_url }}">Register</a></li>
+                        {% endif %}
+                    {% endif %}
+                </ul>
+            </nav>
+            <div class="menu-footer">
+                <div class="menu-social">
+                    {% if settings.social_twitter_link != blank %}
+                    <a href="{{ settings.social_twitter_link }}" aria-label="X (formerly Twitter)">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                        </svg>
+                    </a>
+                    {% endif %}
+                    {% if settings.social_instagram_link != blank %}
+                    <a href="{{ settings.social_instagram_link }}" aria-label="Instagram">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                            <path d="m16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                        </svg>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <button class="menu-btn" id="menuBtn">Menu</button>
+                                                
+            <div class="logo-container floating">
+                <div class="logo-circle">
+                   {% if settings.logo != blank %}
+                   <img src="{{ settings.logo | img_url: '100x100' }}" alt="{{ shop.name }}">
+                   {% else %}
+                   <img src="{{ 'logo.svg' | asset_url }}" alt="{{ shop.name }}">
+                   {% endif %}
+                </div>
+                <h1 class="brand-name">{{ shop.name }}</h1>
+            </div>
+                                                
+            <div class="header-right">
+                <div class="social-links">
+                    {% if settings.social_twitter_link != blank %}
+                    <a href="{{ settings.social_twitter_link }}" class="social-link" aria-label="X (formerly Twitter)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                        </svg>
+                    </a>
+                    {% endif %}
+                    {% if settings.social_instagram_link != blank %}
+                    <a href="{{ settings.social_instagram_link }}" class="social-link" aria-label="Instagram">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                            <path d="m16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                        </svg>
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="language">{{ request.locale.name }}</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-image" id="heroImage">
+            {% if section.settings.hero_image != blank %}
+            <img src="{{ section.settings.hero_image | img_url: '1920x1080' }}" alt="{{ section.settings.hero_title }}">
+            {% else %}
+            <img src="{{ 'hero-1.jpg' | asset_url }}" alt="{{ shop.name }} Luxury Fashion">
+            {% endif %}
+        </div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">                       
+            <div class="hero-text fade-in" style="position: absolute; bottom: 48px;">
+                <a href="{{ routes.collections_url }}">
+                    <button class="cta-button">{{ section.settings.hero_button_text | default: 'Discover Now' }}</button>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Collection -->
+    <section class="featured-collection">
+        <div class="container">
+            <div class="section-header fade-in">
+                <p class="section-subtitle">{{ section.settings.featured_subtitle | default: 'Featured Collection' }}</p>
+                <h3 class="section-title">{{ section.settings.featured_title | default: 'Luxury Essentials' }}</h3>
+            </div>
+            <div class="collection-grid">
+                {% assign featured_collection = collections[section.settings.featured_collection] %}
+                {% if featured_collection != blank %}
+                    {% for product in featured_collection.products limit: 3 %}
+                    <div class="collection-item {% if forloop.first %}large-item{% endif %} grid-item">
+                        <div class="item-image image-reveal">
+                            <a href="{{ product.url }}">
+                                {% if product.featured_image %}
+                                <img src="{{ product.featured_image | img_url: '800x800' }}" alt="{{ product.title }}">
+                                {% else %}
+                                <img src="{{ 'product-placeholder.jpg' | asset_url }}" alt="{{ product.title }}">
+                                {% endif %}
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="collection-item large-item grid-item">
+                        <div class="item-image image-reveal">
+                            <img src="{{ 'collection-2.jpg' | asset_url }}" alt="Cashmere Collection">                                                                          
+                        </div>
+                    </div>
+                    <div class="collection-item grid-item">
+                        <div class="item-image image-reveal">
+                            <img src="{{ 'collection-3.jpg' | asset_url }}" alt="Leather Goods">
+                        </div>
+                    </div>
+                    <div class="collection-item grid-item">
+                        <div class="item-image image-reveal">
+                            <img src="{{ 'collection-4.jpg' | asset_url }}" alt="Footwear">                                                                                 
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Split Image Section -->
+    <section class="split-section">
+        <div class="split-item slide-in-left">
+            <div class="split-image image-reveal">
+                {% if section.settings.split_image_1 != blank %}
+                <img src="{{ section.settings.split_image_1 | img_url: '800x600' }}" alt="{{ section.settings.split_title_1 }}">
+                {% else %}
+                <img src="{{ 'split-5.jpg' | asset_url }}" alt="Craftsmanship">
+                {% endif %}
+            </div>
+            <div class="split-overlay"></div>
+            <div class="split-content">
+                <h3>{{ section.settings.split_title_1 | default: 'Artisan Craftsmanship' }}</h3>
+                <p>{{ section.settings.split_text_1 | default: 'Every piece tells a story of dedication and skill' }}</p>
+            </div>
+        </div>
+        <div class="split-item slide-in-right">
+            <div class="split-image image-reveal">
+                {% if section.settings.split_image_2 != blank %}
+                <img src="{{ section.settings.split_image_2 | img_url: '800x600' }}" alt="{{ section.settings.split_title_2 }}">
+                {% else %}
+                <img src="{{ 'split-6.jpg' | asset_url }}" alt="Sustainability">
+                {% endif %}
+            </div>
+            <div class="split-overlay"></div>
+            <div class="split-content">
+                <h3>{{ section.settings.split_title_2 | default: 'Fine Luxury' }}</h3>
+                <p>{{ section.settings.split_text_2 | default: 'Committed to timeless design' }}</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lifestyle Gallery -->
+    <section class="lifestyle-gallery">
+        <div class="container">
+            <div class="section-header fade-in">
+                <p class="section-subtitle">{{ section.settings.gallery_subtitle | default: 'Lifestyle' }}</p>
+                <h3 class="section-title">{{ section.settings.gallery_title | default: 'The Art of Luxury' }}</h3>
+            </div>
+            <!-- Mobile Carousel -->
+            <div class="mobile-carousel">
+                <div class="carousel-container">
+                    <div class="carousel-slide active">
+                        <div class="carousel-image">
+                           {% comment %} Logo SVG or first gallery image {% endcomment %}
+                           <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="80px" height="80px" viewBox="0 0 50 49" version="1.1"><g id="surface1"><path style=" stroke:none;fill-rule:nonzero;fill:rgb(0%,0%,0%);fill-opacity:1;" d="M 14.574219 9.722656 C 14.574219 9.882812 15.089844 10.046875 15.707031 10.046875 C 17.261719 10.046875 17.390625 10.566406 16.515625 13.707031 C 15.542969 17.273438 13.664062 24.339844 13.050781 26.734375 C 12.46875 29.003906 11.980469 29.492188 10.296875 29.492188 C 9.617188 29.492188 9.066406 29.621094 9.066406 29.816406 C 9.066406 30.007812 10.914062 30.140625 13.925781 30.140625 C 16.9375 30.140625 18.78125 30.007812 18.78125 29.816406 C 18.78125 29.621094 18.003906 29.492188 17.035156 29.492188 C 16.0625 29.492188 15.15625 29.328125 15.058594 29.167969 C 14.929688 28.972656 15.15625 27.773438 15.511719 26.476562 C 15.867188 25.214844 16.449219 23.203125 16.773438 22.035156 L 17.359375 19.929688 L 19.136719 19.832031 C 21.632812 19.703125 22.183594 20.191406 22.148438 22.457031 C 22.117188 23.429688 21.632812 25.894531 21.082031 27.902344 C 20.5 29.945312 19.6875 32.828125 19.269531 34.351562 C 18.847656 35.875 18.328125 37.722656 18.132812 38.46875 L 17.777344 39.859375 L 16.191406 39.859375 C 15.285156 39.859375 14.574219 39.992188 14.574219 40.183594 C 14.574219 40.378906 16.257812 40.507812 18.945312 40.507812 C 21.632812 40.507812 23.316406 40.378906 23.316406 40.183594 C 23.316406 39.992188 22.796875 39.859375 22.183594 39.859375 C 21.4375 39.859375 20.953125 39.667969 20.824219 39.375 C 20.628906 38.855469 21.761719 34.09375 22.667969 31.433594 L 23.1875 29.976562 L 27.6875 29.878906 C 30.148438 29.847656 32.253906 29.910156 32.382812 30.042969 C 32.707031 30.398438 30.179688 39.277344 29.695312 39.601562 C 29.46875 39.730469 28.757812 39.859375 28.109375 39.859375 C 27.429688 39.859375 26.878906 39.992188 26.878906 40.183594 C 26.878906 40.378906 28.5625 40.507812 31.25 40.507812 C 33.9375 40.507812 35.621094 40.378906 35.621094 40.183594 C 35.621094 39.992188 35.039062 39.859375 34.359375 39.859375 C 33.644531 39.859375 33 39.730469 32.871094 39.570312 C 32.707031 39.308594 34.132812 33.703125 36.625 24.792969 C 36.980469 23.527344 37.339844 22.070312 37.46875 21.550781 C 37.757812 20.09375 38.148438 19.769531 39.703125 19.769531 C 40.480469 19.769531 41.125 19.605469 41.125 19.445312 C 41.125 19.25 39.441406 19.121094 36.753906 19.121094 C 34.066406 19.121094 32.382812 19.25 32.382812 19.445312 C 32.382812 19.605469 32.964844 19.769531 33.644531 19.769531 C 34.359375 19.769531 34.972656 19.929688 35.039062 20.15625 C 35.167969 20.480469 33.226562 28.453125 32.964844 28.679688 C 32.773438 28.875 23.671875 28.972656 23.476562 28.777344 C 23.378906 28.679688 23.574219 27.675781 23.929688 26.542969 C 24.253906 25.40625 24.707031 23.722656 24.933594 22.847656 C 25.582031 20.320312 26.035156 19.769531 27.527344 19.769531 C 28.207031 19.769531 28.886719 19.605469 28.984375 19.445312 C 29.113281 19.25 28.238281 19.121094 26.585938 19.121094 C 25.128906 19.121094 23.964844 19.023438 23.964844 18.859375 C 23.964844 18.730469 24.191406 17.824219 24.449219 16.851562 C 25.03125 14.648438 24.839844 14.355469 24.027344 16.234375 C 23.089844 18.375 22.3125 18.894531 19.882812 19.054688 C 18.199219 19.183594 17.8125 19.089844 17.8125 18.730469 C 17.8125 17.792969 19.722656 10.953125 20.109375 10.5 C 20.371094 10.175781 21.277344 10.046875 23.378906 10.046875 C 27.785156 10.046875 28.855469 10.890625 28.886719 14.324219 C 28.886719 15.167969 28.984375 15.878906 29.113281 15.878906 C 29.339844 15.878906 30.441406 10.984375 30.441406 9.949219 C 30.441406 9.429688 29.859375 9.398438 22.507812 9.398438 C 17.421875 9.398438 14.574219 9.527344 14.574219 9.722656 Z M 14.574219 9.722656 "/></g></svg>
+                        </div>
+                    </div>
+                    {% for i in (1..4) %}
+                    <div class="carousel-slide">
+                        <div class="carousel-image">
+                            <img src="{{ 'gallery-' | append: i | append: '.jpg' | asset_url }}" alt="Detail">
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="carousel-dots">
+                    {% for i in (0..4) %}
+                    <span class="dot {% if i == 0 %}active{% endif %}" data-slide="{{ i }}"></span>
+                    {% endfor %}
+                </div>
+            </div>
+            <!-- Desktop Grid -->
+            <div class="gallery-grid">
+                <div class="gallery-item large-gallery-item grid-item">
+                    <div class="gallery-image image-reveal">
+                        <img src="{{ 'gallery-main.jpg' | asset_url }}" alt="Lifestyle">
+                    </div>
+                </div>
+                {% for i in (1..4) %}
+                <div class="gallery-item grid-item">
+                    <div class="gallery-image image-reveal">
+                        <img src="{{ 'gallery-' | append: i | append: '.jpg' | asset_url }}" alt="Detail">
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="newsletter">
+        <div class="newsletter-background" id="newsletterBg">
+            {% if section.settings.newsletter_bg != blank %}
+            <img src="{{ section.settings.newsletter_bg | img_url: '1920x1080' }}" alt="Newsletter background">
+            {% else %}
+            <img src="{{ 'newsletter-bg.jpg' | asset_url }}" alt="Newsletter background">
+            {% endif %}
+        </div>
+        <div class="newsletter-overlay"></div>
+        <div class="newsletter-content fade-in">
+            <h3>{{ section.settings.newsletter_title | default: 'Stay Connected' }}</h3>
+            <p>{{ section.settings.newsletter_text | default: 'Be the first to discover our latest collections and exclusive events' }}</p>
+            {% form 'customer' %}
+            <div class="newsletter-form">
+                <input type="email" name="contact[email]" placeholder="{{ 'general.newsletter_form.email_placeholder' | t }}" class="email-input" required>
+                <input type="hidden" name="contact[tags]" value="newsletter">
+                <button class="subscribe-btn" type="submit">{{ section.settings.newsletter_button | default: 'Subscribe' }}</button>
+            </div>
+            {% endform %}
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column fade-in">
+                    <h4>Collections</h4>
+                    <ul>
+                        <li>
+                            {% if settings.logo != blank %}
+                            <img src="{{ settings.logo | img_url: '100x100' }}" alt="{{ shop.name }}">
+                            {% else %}
+                            <img src="{{ 'logo-white.svg' | asset_url }}" alt="{{ shop.name }}">
+                            {% endif %}
+                        </li>
+                        <li><a href="{{ routes.collections_url }}">Shop Now.</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column fade-in">
+                    <h4>Services</h4>
+                    <ul>
+                        {% for link in linklists.footer-services.links %}
+                        <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+                        {% endfor %}
+                        {% if linklists.footer-services == blank %}
+                        <li><a href="{{ pages['terms-of-service'].url }}">Terms of Service</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+                <div class="footer-column fade-in">
+                    <h4>Support</h4>
+                    <ul>
+                        {% for link in linklists.footer-support.links %}
+                        <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+                        {% endfor %}
+                        {% if linklists.footer-support == blank %}
+                        <li><a href="{{ pages['contact'].url }}">Contact Us</a></li>
+                        <li><a href="{{ pages['privacy-policy'].url }}">Privacy Policy</a></li>
+                        <li><a href="{{ pages['refund-policy'].url }}">Refund Policy</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+                                                
+            <div class="footer-bottom fade-in">
+                <p>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }} - All Rights Reserved</p>
+                <div class="footer-social">
+                    {% if settings.social_twitter_link != blank %}
+                    <a href="{{ settings.social_twitter_link }}" class="footer-social-link" aria-label="X (formerly Twitter)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                        </svg>
+                    </a>
+                    {% endif %}
+                    {% if settings.social_instagram_link != blank %}
+                    <a href="{{ settings.social_instagram_link }}" class="footer-social-link" aria-label="Instagram">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                            <path d="m16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                        </svg>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Message Modal for notifications -->
+    <div id="messageModal" class="modal-overlay" style="display:none;">
+        <div class="modal-box">
+            <span id="closeModal" class="modal-close">&times;</span>
+            <div class="modal-content">
+                {% comment %} Success messages {% endcomment %}
+                {% if form.posted_successfully? %}
+                <div class="modal-message success">
+                    {{ 'general.newsletter_form.confirmation' | t }}
+                </div>
+                {% endif %}
+                
+                {% comment %} Error messages {% endcomment %}
+                {% if form.errors %}
+                <div class="modal-message error">
+                    {{ form.errors | default_errors }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {{ 'luxury-animations.js' | asset_url | script_tag }}
+
+    <script>
+        // Menu functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuBtn = document.getElementById('menuBtn');
+            const menuOverlay = document.getElementById('menuOverlay');
+            const slideMenu = document.getElementById('slideMenu');
+            const menuClose = document.getElementById('menuClose');
+
+            // Open menu
+            menuBtn.addEventListener('click', function() {
+                menuOverlay.classList.add('active');
+                slideMenu.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+
+            // Close menu
+            function closeMenu() {
+                menuOverlay.classList.remove('active');
+                slideMenu.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            menuClose.addEventListener('click', closeMenu);
+            menuOverlay.addEventListener('click', function(e) {
+                if (e.target === menuOverlay) {
+                    closeMenu();
+                }
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && menuOverlay.classList.contains('active')) {
+                    closeMenu();
+                }
+            });
+
+            // Message Modal
+            const modal = document.getElementById('messageModal');
+            const closeBtn = document.getElementById('closeModal');
+
+            {% if form.posted_successfully? or form.errors %}
+                modal.style.display = 'flex';
+            {% endif %}
+
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => modal.style.display = 'none');
+            }
+
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.style.display = 'none';
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') modal.style.display = 'none';
+            });
+
+            // Optional: Auto-close after 4s
+            setTimeout(() => { 
+                if (modal) modal.style.display = 'none'; 
+            }, 4000);
+        });
+    </script>
+</body>
+</html>
+
+{% schema %}
+{
+  "name": "Homepage",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Hero Section"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Hero Background Image"
+    },
+    {
+      "type": "text",
+      "id": "hero_title",
+      "label": "Hero Title",
+      "default": "Luxury Fashion"
+    },
+    {
+      "type": "text",
+      "id": "hero_button_text",
+      "label": "Hero Button Text",
+      "default": "Discover Now"
+    },
+    {
+      "type": "header",
+      "content": "Featured Collection"
+    },
+    {
+      "type": "text",
+      "id": "featured_subtitle",
+      "label": "Featured Subtitle",
+      "default": "Featured Collection"
+    },
+    {
+      "type": "text",
+      "id": "featured_title",
+      "label": "Featured Title",
+      "default": "Luxury Essentials"
+    },
+    {
+      "type": "collection",
+      "id": "featured_collection",
+      "label": "Featured Collection"
+    },
+    {
+      "type": "header",
+      "content": "Split Section"
+    },
+    {
+      "type": "image_picker",
+      "id": "split_image_1",
+      "label": "Split Image 1"
+    },
+    {
+      "type": "text",
+      "id": "split_title_1",
+      "label": "Split Title 1",
+      "default": "Artisan Craftsmanship"
+    },
+    {
+      "type": "text",
+      "id": "split_text_1",
+      "label": "Split Text 1",
+      "default": "Every piece tells a story of dedication and skill"
+    },
+    {
+      "type": "image_picker",
+      "id": "split_image_2",
+      "label": "Split Image 2"
+    },
+    {
+      "type": "text",
+      "id": "split_title_2",
+      "label": "Split Title 2",
+      "default": "Fine Luxury"
+    },
+    {
+      "type": "text",
+      "id": "split_text_2",
+      "label": "Split Text 2",
+      "default": "Committed to timeless design"
+    },
+    {
+      "type": "header",
+      "content": "Gallery Section"
+    },
+    {
+      "type": "text",
+      "id": "gallery_subtitle",
+      "label": "Gallery Subtitle",
+      "default": "Lifestyle"
+    },
+    {
+      "type": "text",
+      "id": "gallery_title",
+      "label": "Gallery Title",
+      "default": "The Art of Luxury"
+    },
+    {
+      "type": "header",
+      "content": "Newsletter Section"
+    },
+    {
+      "type": "image_picker",
+      "id": "newsletter_bg",
+      "label": "Newsletter Background Image"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_title",
+      "label": "Newsletter Title",
+      "default": "Stay Connected"
+    },
+    {
+      "type": "textarea",
+      "id": "newsletter_text",
+      "label": "Newsletter Text",
+      "default": "Be the first to discover our latest collections and exclusive events"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_button",
+      "label": "Newsletter Button Text",
+      "default": "Subscribe"
+    }
+  ]
+}
+{% endschema %}
