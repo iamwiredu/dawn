@@ -1,19 +1,42 @@
 <!-- sections/custom-home.liquid -->
 {% comment %}
   Custom homepage section converted from a Django template.
-  - No Django tags.
-  - Put all assets directly in /assets (no subfolders). Example: 1.jpg, fh-logo.svg, styles.css
+  - Assets go in /assets (no subfolders): 1.jpg, 2.jpg, ..., fh-logo.svg, fh-logo-white.svg, styles.css
 {% endcomment %}
 
-<section class="fh-home">
+<section class="fh-home {% if section.settings.push_below_dawn and not section.settings.hide_dawn_header %}fh--with-top-offset{% endif %}">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="{{ 'fh-logo.svg' | asset_url }}">
   <link rel="stylesheet" href="{{ 'styles.css' | asset_url }}">
 
+  {%- comment -%}
+    Header conflict controls:
+    - hide Dawn header entirely (best if you want your custom header)
+    - OR add a safe top offset so Dawn header doesn't cover hero
+  {%- endcomment -%}
+  {% if section.settings.hide_dawn_header %}
+    <style>
+      /* Hide Dawn's global header for this page only */
+      .shopify-section-header { display: none !important; }
+      /* Remove any top spacing Dawn adds to compensate for the sticky header */
+      #MainContent { margin-top: 0 !important; padding-top: 0 !important; }
+    </style>
+  {% endif %}
+
   <style>
-    .menu-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);backdrop-filter:blur(5px);z-index:999;opacity:0;visibility:hidden;transition:all .3s ease}
+    /* If keeping Dawn header, push our first fold down by header height */
+    :root { --fh-fallback-header-h: 80px; }
+    .fh--with-top-offset { padding-top: var(--header-height, var(--fh-fallback-header-h)); }
+
+    /* Make sure our custom header & overlay sit above Dawn if both are visible */
+    .fh-home .header { position: relative; z-index: 50; }
+    .fh-home .menu-overlay { z-index: 60; }
+    .fh-home .slide-menu { z-index: 70; }
+
+    /* Core styles from your template */
+    .menu-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);backdrop-filter:blur(5px);opacity:0;visibility:hidden;transition:all .3s ease}
     .menu-overlay.active{opacity:1;visibility:visible}
-    .slide-menu{position:fixed;top:0;left:0;width:350px;height:100vh;background:rgba(255,255,255,.954);backdrop-filter:blur(20px);border-right:1px solid rgba(255,255,255,.2);z-index:1000;transform:translateX(-100%);transition:transform .4s cubic-bezier(.4,0,.2,1);padding:2rem;display:flex;flex-direction:column;color:#000}
+    .slide-menu{position:fixed;top:0;left:0;width:350px;height:100vh;background:rgba(255,255,255,.954);backdrop-filter:blur(20px);border-right:1px solid rgba(255,255,255,.2);transform:translateX(-100%);transition:transform .4s cubic-bezier(.4,0,.2,1);padding:2rem;display:flex;flex-direction:column;color:#000}
     .slide-menu.active{transform:translateX(0)}
     .menu-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:3rem;padding-bottom:1rem;border-bottom:1px solid rgba(255,255,255,.2)}
     .menu-logo{color:#000;font-size:1.5rem;font-weight:300;letter-spacing:2px}
@@ -25,6 +48,8 @@
     .menu-nav a::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);transition:left .5s ease}
     .menu-nav a:hover::before{left:100%}
     .menu-btn{background:none;border:none;color:#fff;font-size:1rem;cursor:pointer;padding:.5rem 1rem;border-radius:25px;transition:all .3s ease}
+
+    .hero{position:relative}
     .hero-image{position:absolute;top:0;left:0;width:100%;height:100%;overflow:hidden}
     .hero-image img{width:100%;height:100%;object-fit:cover;object-position:center;transition:transform .3s ease}
     .hero-image img:hover{transform:scale(1.02)}
@@ -312,18 +337,18 @@
       const menuClose = document.getElementById('menuClose');
 
       function closeMenu(){
-        menuOverlay.classList.remove('active');
-        slideMenu.classList.remove('active');
+        menuOverlay?.classList.remove('active');
+        slideMenu?.classList.remove('active');
         document.body.style.overflow = '';
       }
       menuBtn?.addEventListener('click', function(){
-        menuOverlay.classList.add('active');
-        slideMenu.classList.add('active');
+        menuOverlay?.classList.add('active');
+        slideMenu?.classList.add('active');
         document.body.style.overflow = 'hidden';
       });
       menuClose?.addEventListener('click', closeMenu);
       menuOverlay?.addEventListener('click', function(e){ if(e.target===menuOverlay) closeMenu();});
-      document.addEventListener('keydown', function(e){ if(e.key==='Escape' && menuOverlay.classList.contains('active')) closeMenu();});
+      document.addEventListener('keydown', function(e){ if(e.key==='Escape' && menuOverlay?.classList.contains('active')) closeMenu();});
     });
   </script>
 </section>
@@ -331,7 +356,20 @@
 {% schema %}
 {
   "name": "Custom Home (Fly High)",
-  "settings": [],
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "hide_dawn_header",
+      "label": "Hide Dawn header on this page",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "push_below_dawn",
+      "label": "If not hiding, push content below Dawn header",
+      "default": false
+    }
+  ],
   "blocks": [],
   "presets": [
     { "name": "Custom Home (Fly High)" }
