@@ -309,16 +309,45 @@
         </div>
     </div>
 
-     <div class="logo-container floating">
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <button class="menu-btn" id="menuBtn">Menu</button>
+                                                
+            <div class="logo-container floating">
                 <div class="logo-circle">
                    {% if settings.logo != blank %}
                    <img src="{{ settings.logo | img_url: '100x100' }}" alt="{{ shop.name }}">
                    {% else %}
-                   <img src="{{ 'logo.svg' | asset_url }}" alt="{{ shop.name }}">
+                   <img src="{{ 'fh-logo.svg' | asset_url }}" alt="{{ shop.name }}">
                    {% endif %}
                 </div>
                 <h1 class="brand-name">{{ shop.name }}</h1>
             </div>
+                                                
+            <div class="header-right">
+                <div class="social-links">
+                    {% if settings.social_twitter_link != blank %}
+                    <a href="{{ settings.social_twitter_link }}" class="social-link" aria-label="X (formerly Twitter)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                        </svg>
+                    </a>
+                    {% endif %}
+                    {% if settings.social_instagram_link != blank %}
+                    <a href="{{ settings.social_instagram_link }}" class="social-link" aria-label="Instagram">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                            <path d="m16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                        </svg>
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="language">{{ request.locale.name }}</div>
+            </div>
+        </div>
+    </header>
 
     <!-- Hero Section -->
     <section class="hero">
@@ -449,7 +478,7 @@
             <div class="gallery-grid">
                 <div class="gallery-item large-gallery-item grid-item">
                     <div class="gallery-image image-reveal">
-                        <img src="{{ 'gallery-main.jpg' | asset_url }}" alt="Lifestyle">
+                        <img src="{{ 'b1.jpg' | asset_url }}" alt="Lifestyle">
                     </div>
                 </div>
                 {% for i in (1..4) %}
